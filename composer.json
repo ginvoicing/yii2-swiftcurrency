@@ -1,0 +1,49 @@
+{
+    "name": "ginvoicing/yii2-swiftcurrency",
+    "description": "This extension allows yii2 to pull currency from different providers. Cache them in database for further use.",
+    "keywords": ["yii2", "currency", "api", "gateway", "swiftcurrency"],
+    "type": "yii2-extension",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "support": {
+        "issues": "https://github.com/ginvoicing/yii2-swiftcurrency/issues",
+        "source": "https://github.com/ginvoicing/yii2-swiftcurrency"
+    },
+    "authors": [
+        {
+            "name": "Tarun Jangra",
+            "email": "tarun.jangra@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "linslin/yii2-curl": "^1.4.0",
+        "yiisoft/yii2": "^2.0.14",
+        "myclabs/php-enum": "^1.7"
+
+    },
+    "require-dev": {
+        "codeception/codeception": "^4.0",
+        "codeception/verify": "^1.1.0",
+        "codeception/specify": "^0.4.6",
+        "codeception/module-filesystem": "^1.0.0",
+        "codeception/module-yii2": "^1.0.0",
+        "codeception/module-asserts": "^1.0.0",
+        "phpro/grumphp": "^1.0.0",
+        "yiisoft/yii2-coding-standards": "~2.0.0",
+        "codeception/assert-throws": "^1.1"
+    },
+    "autoload": {
+        "psr-4": { "yii\\swiftcurrency\\": "src" }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "([ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/phpcs --config-set installed_paths ../../yiisoft/yii2-coding-standards/)"
+        ],
+        "post-update-cmd": [
+            "([ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/phpcs --config-set installed_paths ../../yiisoft/yii2-coding-standards/)"
+        ]
+    }
+}
