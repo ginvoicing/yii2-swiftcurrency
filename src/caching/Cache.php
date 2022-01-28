@@ -1,35 +1,30 @@
 <?php
+
 namespace yii\swiftcurrency\caching;
 
 use yii\base\InvalidConfigException;
 use yii\base\BaseObject;
 use yii\di\Instance;
-use yii\db\Connection as SqlConnection;
-use yii\swiftcurrency\caching\models\Sql;
+use yii\db\Connection;
+use yii\swiftcurrency\caching\models\CurrencyExchange;
 
-class Cache extends BaseObject implements CachingInterface
+final class Cache extends BaseObject implements CachingInterface
 {
-    /**
-     * @var string
-     */
     public string $tableName = '{{%swiftcurrency_cache}}';
 
     /**
-     * @var array|string|SqlConnection
+     * @var array|string|Connection
      */
     public $connection = null;
-
-    /**
-     * Log table model
-     */
     private string $_model;
 
     public function init()
     {
+        parent::init();
         $this->connection = Instance::ensure($this->connection);
 
-        if ($this->connection instanceof SqlConnection) {
-            $this->_model = Sql::class;
+        if ($this->connection instanceof Connection) {
+            $this->_model = CurrencyExchange::class;
         } else {
             throw new InvalidConfigException("This connections doesn't support.");
         }
@@ -40,7 +35,7 @@ class Cache extends BaseObject implements CachingInterface
         return $this->tableName;
     }
 
-    public function getConnection(): SqlConnection
+    public function getConnection(): Connection
     {
         return $this->connection;
     }
@@ -48,58 +43,34 @@ class Cache extends BaseObject implements CachingInterface
     /**
      * @inheritdoc
      */
-    public function setRecord(array $data): bool
+    public function setRecord(array $tableAttributes): bool
     {
         $record = new $this->_model();
-        foreach ($data as $key => $value) {
-            if ($record->hasAttribute($key)) {
-                $record->$key = $value;
+        foreach ($tableAttributes as $key => $value) {
+            if ($record->hasAttribute(strtolower($key))) {
+                $field = strtolower($key);
+                $record->{$field} = $value;
             }
         }
         return $record->save();
     }
 
     /**
-     * @inheritdoc
+     * Get consumed quota from the database.
+     *
+     * @return array having quota and provider name
      */
-    /*public function updateRecordBySmsId($response_id, $data)
+    public function getUsedQuota(): array
     {
-        if (!empty($response_id)) {
-            $record = new $this->_model();
-            $record = $record->findOne(['response_id' => $response_id]);
-            if ($record) {
-                foreach ($data as $key => $value) {
-                    if ($record->hasAttribute($key)) {
-                        $record->$key = $value;
-                    }
-                }
+         $qProviders = $this->_model::find()
+            ->select(['COUNT(*) AS quota','provider'])
+            ->groupBy(['provider'])
+            ->createCommand()->queryAll();
 
-                return $record->save();
-            }
+         $return = [];
+        foreach ($qProviders as $qProvider) {
+            $return[$qProvider['provider']] = $qProvider['quota'];
         }
-
-        return false;
-    }*/
-
-    /**
-     * @inheritdoc
-     */
-    /*public function updateRecordBySmsIdAndPhone($response_id, $phone, $data)
-    {
-        if (!empty($sms_id)) {
-            $record = new $this->_model();
-            $record = $record->findOne(['response_id' => $response_id, 'phone' => $phone]);
-            if ($record) {
-                foreach ($data as $key => $value) {
-                    if ($record->hasAttribute($key)) {
-                        $record->$key = $value;
-                    }
-                }
-
-                return $record->save();
-            }
-        }
-
-        return false;
-    }*/
+         return $return;
+    }
 }

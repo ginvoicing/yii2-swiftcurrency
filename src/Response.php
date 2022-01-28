@@ -11,7 +11,7 @@ final class Response
     private string $status;
     private DateTime $timeLine;
     private string $baseCurrency = 'USD';
-    private string $exchangeRates;
+    private array $exchangeRates;
     private string $provider;
 
     public function __construct()
@@ -71,13 +71,13 @@ final class Response
 
     public function setExchangeRates(array $exchangeRates): Response
     {
-        $this->exchangeRates = json_encode($exchangeRates);
+        $this->exchangeRates = $exchangeRates;
         return $this;
     }
 
     public function getExchangeRates(): array
     {
-        return json_decode($this->exchangeRates, true);
+        return$this->exchangeRates;
     }
 
     public function setProvider(string $provider): Response

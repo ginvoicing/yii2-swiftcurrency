@@ -15,8 +15,8 @@ class Gateway extends Component
     public array $providers = [];
     public string $baseCurrency;
     public ?array $caching = null;
+    public string $tmpPath = '/tmp';
 
-    private ProviderInterface $_provider;
     private ?CachingInterface $_cachingProvider;
 
 
@@ -43,7 +43,7 @@ class Gateway extends Component
     }
 
     /**
-     * Get selected transporter to be used to send a SMS.
+     * Select provider to be used to pull currency property
      * This property is not read only property for this component.
      *
      * @return ProviderInterface
@@ -55,13 +55,49 @@ class Gateway extends Component
         // useragent for the gateway calls.
         $curlObject->setOption(CURLOPT_USERAGENT, 'yii2-swiftcurrency');
 
-        $params = [
-            'class' => $this->providers[0]['class'],
-            'apiKey' => $this->providers[0]['apiKey']
-        ];
-        $params += $this->providers[0]['params'] ?? [];
-        return \Yii::createObject($params, [$curlObject]);
+
+        // get executed requests.
+        $usedQuota = $this->getCachingProvider()->getUsedQuota();
+        $ctr = 0;
+        $dejectedCounter = 0;
+        foreach ($this->providers as $givenProvider) {
+            if (!file_exists($this->tmpPath . '/' . $givenProvider['class'])) {
+                $selectedProvider = \Yii::createObject($givenProvider, [$curlObject]);
+                $selectionPointerName = $this->tmpPath . '/' . $selectedProvider->getName();
+                if (isset($usedQuota[$selectedProvider->getName()])) {
+                    if ($selectedProvider->getMonthlyQuota() >= $usedQuota[$selectedProvider->getName()]) {
+                        touch($selectionPointerName);
+                        break;
+                    } else {
+                        $dejectedCounter++;
+                    }
+                }
+            } else {
+                $ctr++;
+            }
+        }
+        $totalEligibleProviders = count($this->providers)-$dejectedCounter;
+        if ($ctr===$totalEligibleProviders) {
+            $pointers = glob($this->tmpPath . '/yii*');
+            array_walk($pointers, function ($file) {
+                unlink($file);
+            });
+            return $this->getProvider();
+        }
+
+//        do {
+//            $selectedProvider = \Yii::createObject($this->providers[$i], [$curlObject]);
+//            $previousProviderName = $this->tmpPath . '/' . $selectedProvider->getName();
+//        } while (file_exists($previousProviderName) || $selectedProvider->getMonthlyQuota() <= $usedQuota[$selectedProvider->getName()]);
+
+//        touch($selectionPointerName);
+
+        // get available quota.
+        // if executed requests are less than quota only than make the provider eligible to be picked.
+        // avoid last picked gateway
+        return $selectedProvider;
     }
+
 
     /**
      * Get exchange rates.
@@ -69,24 +105,26 @@ class Gateway extends Component
      * @throws RatePullException
      */
 
-    public function getRates(): Response
+    public function pullRatesFromProvider(): Response
     {
         $response = $this->getProvider()->getExchangeRates($this->baseCurrency);
-
         if ($this->caching && $response && $response->getStatus() == Status::SUCCESS()) {
-            $this->getCachingProvider()->setRecord([
+            $properties = [
                 'timeline' => $response->getTimeLine()->format('Y-m-d H:i:s'),
                 'base_currency' => $response->getBaseCurrency(),
-                'exchange_rates' => json_encode($response->getExchangeRates()),
-                'provider' => $response->getProvider()
-            ]);
+                'provider' => $response->getProvider(),
+                'raw' => $response->getRaw()
+            ];
+            $objectToBeSaved = array_merge($properties, $response->getExchangeRates());
+
+            $this->getCachingProvider()->setRecord($objectToBeSaved);
         }
 
         return $response;
     }
 
     /**
-     * Get credit balance of SMS available in the account.
+     * Get balance calls from the provider.
      *
      * @return int
      * @throws exceptions\BalanceException
@@ -95,7 +133,6 @@ class Gateway extends Component
     {
         return $this->getProvider()->getBalance();
     }
-
 
     public function getCachingProvider(): ?CachingInterface
     {

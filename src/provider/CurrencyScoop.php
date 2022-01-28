@@ -11,11 +11,11 @@ use yii\swiftcurrency\Response;
 class CurrencyScoop extends Base implements ProviderInterface
 {
     public string $apiKey;
-    public int $frequencyInMinutes = 60;
 
 
     private string $_baseApi = 'https://api.currencyscoop.com/v1';
-    private array $responseCodesMap = [
+    protected int $monthlyQuota = 5000;
+    protected array $responseCodesMap = [
         200 => 'Success Everything went smooth.',
         400 => 'Unauthorized Missing or incorrect API token in header.',
         422 => 'Unprocessable Entity meaning something with the message isn’t quite right, this could be malformed JSON or incorrect fields. In this case, the response body contains JSON with an API error code and message containing details on what went wrong.',
@@ -43,14 +43,14 @@ class CurrencyScoop extends Base implements ProviderInterface
     {
         $rawResponse = $this->_curl
             ->reset()
-            ->get("{$this->_baseApi}/latest?base={$baseCurrency}&api_key={$this->apiKey}");
+            ->get("{$this->_baseApi}/latest?api_key={$this->apiKey}");
         if ($rawResponse == null) {
             throw new RatePullException('{"status":"FAILED","message": "Connection problem with the gateway.","output": null}');
         }
         $decodedResponse = json_decode($rawResponse, true);
         $timelineObject = new \DateTime($decodedResponse['response']['date']);
         return (new Response())
-            ->setBaseCurrency($baseCurrency)
+            ->setBaseCurrency($decodedResponse['response']['base'])
             ->setTimeLine($timelineObject)
             ->setExchangeRates($decodedResponse['response']['rates'])
             ->setRaw($rawResponse)

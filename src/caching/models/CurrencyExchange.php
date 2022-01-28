@@ -1,9 +1,10 @@
 <?php
+
 namespace yii\swiftcurrency\caching\models;
 
 use yii\db\ActiveRecord;
 
-class Sql extends ActiveRecord
+class CurrencyExchange extends ActiveRecord
 {
     public static function getDb()
     {
@@ -18,7 +19,7 @@ class Sql extends ActiveRecord
     public function rules()
     {
         return [
-            [['timeline', 'base_currency', 'exchange_rates'], 'required'],
+            [['timeline', 'base_currency', 'provider'], 'required'],
             [['provider'], 'string', 'max' => 100]
         ];
     }

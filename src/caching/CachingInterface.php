@@ -4,29 +4,10 @@ namespace yii\swiftcurrency\caching;
 interface CachingInterface
 {
     /**
-     * Add new record to log
+     * Add new record to currency caching table
      *
-     * @param array $data
+     * @param array $tableAttributes
      * @return bool
      */
-    public function setRecord(array $data): bool;
-
-    /**
-     * Update log record by response_id
-     *
-     * @param string $response_id
-     * @param array $data
-     * @return bool
-     */
-//    public function updateRecordBySmsId($response_id, $data);
-
-    /**
-     * Update log record by response_id and recipient phone number
-     *
-     * @param string $response_id
-     * @param string $phone
-     * @param array $data
-     * @return bool
-     */
-//    public function updateRecordBySmsIdAndPhone($response_id, $phone, $data);
+    public function setRecord(array $tableAttributes): bool;
 }
