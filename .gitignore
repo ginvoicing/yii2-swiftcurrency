@@ -27,6 +27,8 @@ phpunit.phar
 # local phpunit config
 /phpunit.xml
 .env
+
+/tests/_output/logs
 # local tests configuration
 /tests/data/config.local.php
 

@@ -4,7 +4,7 @@ return [
     'class' => \yii\console\Application::class,
     'basePath' => \Yii::getAlias('@tests'),
     'runtimePath' => \Yii::getAlias('@tests/_output'),
-    'bootstrap' => [],
+    'bootstrap' => ['log'],
     'controllerMap' => [
         'migrate' => [
             'class' => 'yii\console\controllers\MigrateController',
@@ -21,6 +21,13 @@ return [
             'username' => 'currencyuser',
             'password' => 'password',
             'charset' => 'utf8'
-        ]
+        ],
+        'log' => [
+            'targets' => [
+                [
+                    'class' => 'yii\log\FileTarget'
+                ],
+            ],
+        ],
     ]
 ];

@@ -41,20 +41,30 @@ class CurrencyScoop extends Base implements ProviderInterface
 
     public function getExchangeRates(string $baseCurrency): Response
     {
+        if (defined('YII_DEBUG') && YII_DEBUG) {
+            \Yii::trace("CurrencyScoop Endpoint: {$this->_baseApi}/latest.json?app_id={$this->apiKey}");
+        }
         $rawResponse = $this->_curl
             ->reset()
             ->get("{$this->_baseApi}/latest?api_key={$this->apiKey}");
-        if ($rawResponse == null) {
-            throw new RatePullException('{"status":"FAILED","message": "Connection problem with the gateway.","output": null}');
+        
+        switch ($this->_curl->responseCode) {
+            case 'timeout':
+                throw new RatePullException('{"status":"FAILED","message": "Connection timeout.","output": null}');
+            case 200:
+                $decodedResponse = json_decode($rawResponse, true);
+                $timelineObject = new \DateTime($decodedResponse['response']['date']);
+                return (new Response())
+                    ->setBaseCurrency($decodedResponse['response']['base'])
+                    ->setTimeLine($timelineObject)
+                    ->setExchangeRates($decodedResponse['response']['rates'])
+                    ->setRaw($rawResponse)
+                    ->setProvider(get_class($this))
+                    ->setStatus(Status::SUCCESS());
+                break;
+        
+            case 404:
+                throw new RatePullException('{"status":"FAILED","message": "Connection problem with the gateway.","output": null}');
         }
-        $decodedResponse = json_decode($rawResponse, true);
-        $timelineObject = new \DateTime($decodedResponse['response']['date']);
-        return (new Response())
-            ->setBaseCurrency($decodedResponse['response']['base'])
-            ->setTimeLine($timelineObject)
-            ->setExchangeRates($decodedResponse['response']['rates'])
-            ->setRaw($rawResponse)
-            ->setProvider(get_class($this))
-            ->setStatus(Status::SUCCESS());
     }
 }
