@@ -64,7 +64,8 @@ final class Cache extends BaseObject implements CachingInterface
     {
          $qProviders = $this->_model::find()
             ->select(['COUNT(*) AS quota','provider'])
-            ->groupBy(['provider'])
+            ->where('DATE_FORMAT(timeline,"%Y-%m") = DATE_FORMAT(NOW(),"%Y-%m")')
+            ->groupBy(['provider', 'DATE_FORMAT(timeline,"%Y-%m")'])
             ->createCommand()->queryAll();
 
          $return = [];
