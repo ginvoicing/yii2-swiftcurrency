@@ -60,13 +60,18 @@ class Fixer extends Base implements ProviderInterface
             case 200:
                 $decodedResponse = json_decode($rawResponse, true);
                 $timelineObject = new \DateTime();
-                return (new Response())
+                if ($decodedResponse['success']) {
+                    return (new Response())
                     ->setBaseCurrency($decodedResponse['base'])
                     ->setTimeLine($timelineObject)
                     ->setExchangeRates($decodedResponse['rates'])
                     ->setRaw($rawResponse)
                     ->setProvider(get_class($this))
                     ->setStatus(Status::SUCCESS());
+                } else {
+                    $decodedResponse['status'] = 'FAILED';
+                    throw new RatePullException(json_encode($decodedResponse));
+                }
                 break;
             case 404:
                 throw new RatePullException('{"status":"FAILED","message": "Connection problem with the gateway.","output": null}');
