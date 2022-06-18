@@ -42,15 +42,15 @@ class CurrencyScoop extends Base implements ProviderInterface
     public function getExchangeRates(string $baseCurrency): Response
     {
         if (defined('YII_DEBUG') && YII_DEBUG) {
-            \Yii::trace("CurrencyScoop Endpoint: {$this->_baseApi}/latest.json?app_id={$this->apiKey}");
+            \Yii::trace("CurrencyScoop Endpoint: {$this->_baseApi}/latest?app_key={$this->apiKey}");
         }
         $rawResponse = $this->_curl
             ->reset()
             ->get("{$this->_baseApi}/latest?api_key={$this->apiKey}");
         
         switch ($this->_curl->responseCode) {
-            case 'timeout':
-                throw new RatePullException('{"status":"FAILED","message": "Connection timeout.","output": null}');
+            case 429:
+                throw new RatePullException('{"status":"FAILED","message": "Too many requests. API limits reached.","output": null}');
             case 200:
                 $decodedResponse = json_decode($rawResponse, true);
                 $timelineObject = new \DateTime($decodedResponse['response']['date']);
@@ -62,9 +62,12 @@ class CurrencyScoop extends Base implements ProviderInterface
                     ->setProvider(get_class($this))
                     ->setStatus(Status::SUCCESS());
                 break;
-        
-            case 404:
-                throw new RatePullException('{"status":"FAILED","message": "Connection problem with the gateway.","output": null}');
+            case 401:
+                throw new RatePullException('{"status":"FAILED","message": "Unauthorized Missing or incorrect API token in header.","output": null}');
+            case 500:
+                throw new RatePullException('{"status":"FAILED","message": "Internal Server Error This is an issue with Currencyscoop\'s servers processing your request. In most cases the message is lost during the process, and we are notified so that we can investigate the issue.","output": null }');
+            case 401:
+                throw new RatePullException('{"status":"FAILED","message": "Unauthorized Missing or incorrect API token in header.","output": null}');
         }
     }
 }
