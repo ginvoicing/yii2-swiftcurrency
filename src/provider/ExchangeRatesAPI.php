@@ -54,7 +54,7 @@ class ExchangeRatesAPI extends Base implements ProviderInterface
         $rawResponse = $this->_curl
             ->reset()
             ->get("{$this->_baseApi}/latest?access_key={$this->apiKey}");
-        
+
         switch ($this->_curl->responseCode) {
             case 'timeout':
                 throw new RatePullException('{"status":"FAILED","message": "Connection timeout.","output": null}');
@@ -71,6 +71,8 @@ class ExchangeRatesAPI extends Base implements ProviderInterface
                 break;
             case 404:
                 throw new RatePullException('{"status":"FAILED","message": "Connection problem with the gateway.","output": null}');
+            default:
+                throw new RatePullException('{"status":"FAILED","message": "Unknown error.","output": null}');
         }
     }
 }

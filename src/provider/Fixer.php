@@ -75,6 +75,8 @@ class Fixer extends Base implements ProviderInterface
                 break;
             case 404:
                 throw new RatePullException('{"status":"FAILED","message": "Connection problem with the gateway.","output": null}');
+            default:
+                throw new RatePullException('{"status":"FAILED","message": "Unknown error.","output": null}');
         }
     }
 }

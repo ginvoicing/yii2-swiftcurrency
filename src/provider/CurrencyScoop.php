@@ -13,7 +13,7 @@ class CurrencyScoop extends Base implements ProviderInterface
     public string $apiKey;
 
 
-    private string $_baseApi = 'https://api.currencyscoop.com/v1';
+    private string $_baseApi = 'https://api.currencybeacon.com/v1';
     protected int $monthlyQuota = 5000;
     protected array $responseCodesMap = [
         200 => 'Success Everything went smooth.',
@@ -47,7 +47,7 @@ class CurrencyScoop extends Base implements ProviderInterface
         $rawResponse = $this->_curl
             ->reset()
             ->get("{$this->_baseApi}/latest?api_key={$this->apiKey}");
-        
+
         switch ($this->_curl->responseCode) {
             case 429:
                 throw new RatePullException('{"status":"FAILED","message": "Too many requests. API limits reached.","output": null}');
@@ -68,6 +68,8 @@ class CurrencyScoop extends Base implements ProviderInterface
                 throw new RatePullException('{"status":"FAILED","message": "Internal Server Error This is an issue with Currencyscoop\'s servers processing your request. In most cases the message is lost during the process, and we are notified so that we can investigate the issue.","output": null }');
             case 401:
                 throw new RatePullException('{"status":"FAILED","message": "Unauthorized Missing or incorrect API token in header.","output": null}');
+            default:
+                throw new RatePullException('{"status":"FAILED","message": "Unknown error.","output": null}');
         }
     }
 }
