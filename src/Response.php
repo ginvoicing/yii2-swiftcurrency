@@ -8,7 +8,7 @@ use \DateTime;
 final class Response
 {
     private ?string $raw = null;
-    private string $status;
+    private Status $status;
     private DateTime $timeLine;
     private string $baseCurrency = 'USD';
     private array $exchangeRates;
@@ -17,7 +17,7 @@ final class Response
     public function __construct()
     {
         $this
-            ->setStatus(Status::PENDING())
+            ->setStatus(Status::PENDING)
             ->setRaw('{"status":"ERROR", "message":"Connectivity problem."}');
     }
 
@@ -58,13 +58,13 @@ final class Response
         return $this;
     }
 
-    public function setStatus(string $status): Response
+    public function setStatus(Status $status): Response
     {
         $this->status = $status;
         return $this;
     }
 
-    public function getStatus(): string
+    public function getStatus(): Status
     {
         return $this->status;
     }

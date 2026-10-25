@@ -49,10 +49,9 @@ class Fixer extends Base implements ProviderInterface
     public function getExchangeRates(string $baseCurrency): Response
     {
         if (defined('YII_DEBUG') && YII_DEBUG) {
-            \Yii::trace("Fixter Endpoint: {$this->_baseApi}/latest.json?app_id={$this->apiKey}");
+            \Yii::debug("Fixter Endpoint: {$this->_baseApi}/latest.json?app_id={$this->apiKey}");
         }
-        $rawResponse = $this->_curl
-            ->reset()
+        $rawResponse = $this->resetCurl()
             ->get("{$this->_baseApi}/latest?access_key={$this->apiKey}");
         switch ($this->_curl->responseCode) {
             case 'timeout':
@@ -67,7 +66,7 @@ class Fixer extends Base implements ProviderInterface
                     ->setExchangeRates($decodedResponse['rates'])
                     ->setRaw($rawResponse)
                     ->setProvider(get_class($this))
-                    ->setStatus(Status::SUCCESS());
+                    ->setStatus(Status::SUCCESS);
                 } else {
                     $decodedResponse['status'] = 'FAILED';
                     throw new RatePullException(json_encode($decodedResponse));

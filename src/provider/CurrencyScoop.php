@@ -42,10 +42,9 @@ class CurrencyScoop extends Base implements ProviderInterface
     public function getExchangeRates(string $baseCurrency): Response
     {
         if (defined('YII_DEBUG') && YII_DEBUG) {
-            \Yii::trace("CurrencyScoop Endpoint: {$this->_baseApi}/latest?app_key={$this->apiKey}");
+            \Yii::debug("CurrencyScoop Endpoint: {$this->_baseApi}/latest?app_key={$this->apiKey}");
         }
-        $rawResponse = $this->_curl
-            ->reset()
+        $rawResponse = $this->resetCurl()
             ->get("{$this->_baseApi}/latest?api_key={$this->apiKey}");
 
         switch ($this->_curl->responseCode) {
@@ -60,7 +59,7 @@ class CurrencyScoop extends Base implements ProviderInterface
                     ->setExchangeRates($decodedResponse['response']['rates'])
                     ->setRaw($rawResponse)
                     ->setProvider(get_class($this))
-                    ->setStatus(Status::SUCCESS());
+                    ->setStatus(Status::SUCCESS);
                 break;
             case 401:
                 throw new RatePullException('{"status":"FAILED","message": "Unauthorized Missing or incorrect API token in header.","output": null}');
