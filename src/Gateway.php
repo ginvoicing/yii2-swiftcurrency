@@ -17,7 +17,7 @@ class Gateway extends Component
     public ?array $caching = null;
     public string $tmpPath = '/tmp';
 
-    private ?CachingInterface $_cachingProvider;
+    private ?CachingInterface $_cachingProvider = null;
 
 
     public function init()
@@ -57,7 +57,7 @@ class Gateway extends Component
 
 
         // get executed requests.
-        $usedQuota = $this->getCachingProvider()->getUsedQuota();
+        $usedQuota = $this->getCachingProvider()?->getUsedQuota() ?? [];
         $ctr = 0;
         $dejectedCounter = 0;
         foreach ($this->providers as $givenProvider) {

@@ -17,7 +17,7 @@ return [
     'components' => [
         'db' => [
             'class' => \yii\db\Connection::class,
-            'dsn' => 'mysql:host=127.0.0.1;port:3306;dbname=currencydb',
+            'dsn' => 'mysql:host=127.0.0.1;port=3306;dbname=currencydb',
             'username' => 'currencyuser',
             'password' => 'password',
             'charset' => 'utf8'

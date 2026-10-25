@@ -21,7 +21,7 @@ class M321203203317CurrencyCache extends \yii\db\Migration
          * @var Cache $cacheProvider
          */
         $cacheProvider = \Yii::$app->swiftcurrency->getCachingProvider();
-        if ($cacheProvider === false) {
+        if ($cacheProvider === null) {
             throw new BadCachingProvider('Caching agent is required.');
         }
         $this->tableName = $cacheProvider->getTableName();

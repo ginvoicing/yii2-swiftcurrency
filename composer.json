@@ -16,24 +16,23 @@
         }
     ],
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.3",
         "ext-json": "*",
         "ext-curl": "*",
         "linslin/yii2-curl": "^1.5.0",
-        "yiisoft/yii2": "^2.0.14",
-        "myclabs/php-enum": "^1.7"
-
+        "yiisoft/yii2": "^2.0.55",
+        "myclabs/php-enum": "^1.8.5"
     },
     "require-dev": {
-        "codeception/codeception": "^4.0",
-        "codeception/verify": "^1.1.0",
-        "codeception/specify": "^0.4.6",
-        "codeception/module-filesystem": "^1.0.0",
-        "codeception/module-yii2": "^1.0.0",
-        "codeception/module-asserts": "^1.0.0",
-        "phpro/grumphp": "^1.0.0",
-        "yiisoft/yii2-coding-standards": "~2.0.0",
-        "codeception/assert-throws": "^1.1"
+        "codeception/codeception": "^5.3",
+        "codeception/verify": "^3.4",
+        "codeception/module-filesystem": "^3.0",
+        "codeception/module-yii2": "^2.0",
+        "codeception/module-asserts": "^3.3",
+        "phpro/grumphp": "^2.26",
+        "yiisoft/yii2-coding-standards": "^3.0",
+        "codeception/assert-throws": "^1.6",
+        "yidas/yii2-composer-bower-skip": "^2.0"
     },
     "autoload": {
         "psr-4": { "yii\\swiftcurrency\\": "src" }
@@ -45,5 +44,11 @@
         "post-update-cmd": [
             "([ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/phpcs --config-set installed_paths ../../yiisoft/yii2-coding-standards/)"
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "phpro/grumphp": true
+        }
     }
 }
