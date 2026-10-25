@@ -53,6 +53,6 @@ class GatewayTest extends Codeception\Test\Unit
 
     public function testExchangeRates()
     {
-        $this->assertTrue(\Yii::$app->swiftcurrency->pullRatesFromProvider()->getStatus() == \yii\swiftcurrency\enum\Status::SUCCESS());
+        $this->assertSame(\yii\swiftcurrency\enum\Status::SUCCESS, \Yii::$app->swiftcurrency->pullRatesFromProvider()->getStatus());
     }
 }

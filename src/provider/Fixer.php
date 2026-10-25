@@ -66,7 +66,7 @@ class Fixer extends Base implements ProviderInterface
                     ->setExchangeRates($decodedResponse['rates'])
                     ->setRaw($rawResponse)
                     ->setProvider(get_class($this))
-                    ->setStatus(Status::SUCCESS());
+                    ->setStatus(Status::SUCCESS);
                 } else {
                     $decodedResponse['status'] = 'FAILED';
                     throw new RatePullException(json_encode($decodedResponse));

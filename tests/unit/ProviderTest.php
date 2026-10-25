@@ -39,13 +39,18 @@ class ProviderTest extends Codeception\Test\Unit
         return \Yii::createObject(['class' => $class, 'apiKey' => 'test-key'], [$curl]);
     }
 
+    public function testResponseDefaultsToPending()
+    {
+        $this->assertSame(Status::PENDING, (new \yii\swiftcurrency\Response())->getStatus());
+    }
+
     public function testCurrencyScoopRates()
     {
         $curl = new FakeCurl();
         $curl->nextBody = '{"response":{"date":"2026-10-25T00:00:00Z","base":"EUR","rates":{"USD":1.08,"INR":90.1}}}';
         $response = $this->createProvider(CurrencyScoop::class, $curl)->getExchangeRates('EUR');
 
-        $this->assertTrue($response->getStatus() == Status::SUCCESS());
+        $this->assertSame(Status::SUCCESS, $response->getStatus());
         $this->assertSame('EUR', $response->getBaseCurrency());
         $this->assertSame(['USD' => 1.08, 'INR' => 90.1], $response->getExchangeRates());
         $this->assertSame('2026-10-25', $response->getTimeLine()->format('Y-m-d'));
@@ -61,7 +66,7 @@ class ProviderTest extends Codeception\Test\Unit
             $curl->nextBody = $body;
             $response = $this->createProvider($class, $curl)->getExchangeRates('EUR');
 
-            $this->assertTrue($response->getStatus() == Status::SUCCESS(), $class);
+            $this->assertSame(Status::SUCCESS, $response->getStatus(), $class);
             $this->assertSame(['USD' => 1.08], $response->getExchangeRates(), $class);
             $this->assertSame($body, $response->getRaw(), $class);
         }
@@ -112,7 +117,7 @@ class ProviderTest extends Codeception\Test\Unit
         $provider->getExchangeRates('EUR');
         $response = $provider->getExchangeRates('EUR');
 
-        $this->assertTrue($response->getStatus() == Status::SUCCESS());
+        $this->assertSame(Status::SUCCESS, $response->getStatus());
         $this->assertCount(2, $curl->requestedUrls);
     }
 

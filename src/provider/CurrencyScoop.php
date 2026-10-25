@@ -59,7 +59,7 @@ class CurrencyScoop extends Base implements ProviderInterface
                     ->setExchangeRates($decodedResponse['response']['rates'])
                     ->setRaw($rawResponse)
                     ->setProvider(get_class($this))
-                    ->setStatus(Status::SUCCESS());
+                    ->setStatus(Status::SUCCESS);
                 break;
             case 401:
                 throw new RatePullException('{"status":"FAILED","message": "Unauthorized Missing or incorrect API token in header.","output": null}');

@@ -108,7 +108,7 @@ class Gateway extends Component
     public function pullRatesFromProvider(): Response
     {
         $response = $this->getProvider()->getExchangeRates($this->baseCurrency);
-        if ($this->caching && $response && $response->getStatus() == Status::SUCCESS()) {
+        if ($this->caching && $response && $response->getStatus() === Status::SUCCESS) {
             $properties = [
                 'timeline' => $response->getTimeLine()->format('Y-m-d H:i:s'),
                 'base_currency' => $response->getBaseCurrency(),

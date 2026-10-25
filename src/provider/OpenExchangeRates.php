@@ -53,7 +53,7 @@ class OpenExchangeRates extends Base implements ProviderInterface
                     ->setExchangeRates($decodedResponse['rates'])
                     ->setRaw($rawResponse)
                     ->setProvider(get_class($this))
-                    ->setStatus(Status::SUCCESS());
+                    ->setStatus(Status::SUCCESS);
                 break;
             case 404:
                 throw new RatePullException('{"status":"FAILED","message": "Connection problem with the gateway.","output": null}');

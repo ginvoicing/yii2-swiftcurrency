@@ -20,8 +20,7 @@
         "ext-json": "*",
         "ext-curl": "*",
         "linslin/yii2-curl": "^1.5.0",
-        "yiisoft/yii2": "^2.0.55",
-        "myclabs/php-enum": "^1.8.5"
+        "yiisoft/yii2": "^2.0.55"
     },
     "require-dev": {
         "codeception/codeception": "^5.3",
